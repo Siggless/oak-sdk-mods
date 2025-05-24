@@ -1,0 +1,9 @@
+[project]
+name = "Dialog Tweaks"
+version = "1.0"
+authors = [{name = "Siggles"}]
+description = "Adds options for toggling types of dialog, and changing the frequency of types of combat dialog."
+
+[tool.sdkmod]
+license = {name = "GPL3", url = "https://choosealicense.com/licenses/gpl-3.0/" }
+supported_games = ["BL3", "WL"]
