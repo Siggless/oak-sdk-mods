@@ -11,3 +11,4 @@ In BL3 the prompt doesn't always show, because the HUD only shows max 2 prompts.
 [tool.sdkmod]
 license = {name = "GPL3", url = "https://choosealicense.com/licenses/gpl-3.0/" }
 supported_games = ["BL3", "WL"]
+download = "https://github.com/Siggless/oak-sdk-mods/raw/refs/heads/main/PickupAsTrash/PickupAsTrash.sdkmod"
