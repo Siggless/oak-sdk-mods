@@ -1,0 +1,13 @@
+[project]
+name = "Pickup As Trash"
+version = "1.0"
+authors = [{name = "Siggles"}]
+description = """
+Adds a secondary interaction to pickups, to pickup and mark as trash.
+
+In BL3 the prompt doesn't always show, because the HUD only shows max 2 prompts.
+"""
+
+[tool.sdkmod]
+license = {name = "GPL3", url = "https://choosealicense.com/licenses/gpl-3.0/" }
+supported_games = ["BL3", "WL"]
