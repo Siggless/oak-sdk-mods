@@ -1,14 +1,13 @@
 [project]
 name = "Pickup As Trash"
-version = "1.0"
+version = "1.1"
 authors = [{name = "Siggles"}]
 description = """
-Adds a secondary interaction to pickups, to pickup and mark as trash.
-
-In BL3 the prompt doesn't always show, because the HUD only shows max 2 prompts.
+Adds a secondary interaction to pickups, to pickup and mark as trash, and adds a "Sell All Trash" secondary interaction to weapon vendors in BL3.
+\nThis is not a bindable mod key - it uses the game's "Secondary Use" bind, when looking at an item.
+\nIn BL3 the HUD prompt doesn't always show, because the HUD only shows max 2 prompts, but the interaction still works.
 """
 
 [tool.sdkmod]
 license = {name = "GPL3", url = "https://choosealicense.com/licenses/gpl-3.0/" }
 supported_games = ["BL3", "WL"]
-download = "https://github.com/Siggless/oak-sdk-mods/raw/refs/heads/main/PickupAsTrash/PickupAsTrash.sdkmod"
