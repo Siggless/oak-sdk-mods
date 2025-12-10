@@ -11,3 +11,4 @@ Adds a secondary interaction to pickups, to pickup and mark as trash, and adds a
 [tool.sdkmod]
 license = {name = "GPL3", url = "https://choosealicense.com/licenses/gpl-3.0/" }
 supported_games = ["BL3", "WL"]
+download = "https://github.com/Siggless/oak-sdk-mods/raw/refs/heads/main/PickupAsTrash/PickupAsTrash.sdkmod"
