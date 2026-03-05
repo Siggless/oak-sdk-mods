@@ -1,5 +1,5 @@
 from mods_base import build_mod, hook, Game, Mod, BoolOption, NestedOption, SliderOption
-from typing import Any, Dict
+from typing import Any, Dict, List
 from unrealsdk import find_all, find_object
 from unrealsdk.hooks import Type
 from unrealsdk.unreal import UObject, WrappedStruct, BoundFunction
@@ -7,19 +7,43 @@ from unrealsdk.unreal import UObject, WrappedStruct, BoundFunction
 
 WHITELIST = {
     Game.BL3:[
+        # Sanctuary decompression crash
+        "/Game/Dialog/Scripts/Scripted/DialogScript_Sanctuary.DialogScript_Sanctuary:DialogTimeSlotData_24.DialogLineData_24.DialogPerformanceData_24",
+        # Lorelei door objective advance
+        "/Game/Dialog/Scripts/Scripted/DialogScript_Hostile_Takeover.DialogScript_Hostile_Takeover:DialogTimeSlotData_73.DialogLineData_0.DialogPerformanceData_0",
+        #"/Game/Dialog/Scripts/Scripted/DialogScript_Hostile_Takeover.DialogScript_Hostile_Takeover:DialogTimeSlotData_126.DialogLineData_0.DialogPerformanceData_0",
+        # Follow Maya bell 3
+        "/Game/Dialog/Scripts/Scripted/DialogScript_Monastery.DialogScript_Monastery:DialogTimeSlotData_104.DialogLineData_0.DialogPerformanceData_0",
+        # Sanctuary 3 Lilith Maya convo block
+        '/Game/Dialog/Scripts/Scripted/DialogScript_Monastery.DialogScript_Monastery:DialogTimeSlotData_145.DialogLineData_0.DialogPerformanceData_0',
+        # Rhys-ball wake
+        '/Game/Dialog/Scripts/Scripted/DialogScript_Orbital_Platform.DialogScript_Orbital_Platform:DialogTimeSlot_Orbital_Platform_105.DialogLine_Orbital_Platform_105_01.DialogPerformance_Orbital_Platform_105_01_01',
+        # Beneath the Meridian Zer0 appearance
+        '/Game/Dialog/Scripts/Scripted/DialogScript_City_Vault.DialogScript_City_Vault:DialogTimeSlotData_30.DialogLineData_0.DialogPerformanceData_0',
+        # Beneath the Meridian funeral end
+        '/Game/Dialog/Scripts/Scripted/DialogScript_City_Vault.DialogScript_City_Vault:DialogTimeSlotData_174.DialogLineData_0.DialogPerformanceData_0',
+        # Hammerlocked start
+        '/Game/Dialog/Scripts/Scripted/DialogScript_Prison.DialogScript_Prison:DialogTimeSlotData_27.DialogLineData_1.DialogPerformanceData_1',
+        #'/Game/Dialog/Scripts/Scripted/DialogScript_Prison.DialogScript_Prison:DialogTimeSlotData_28.DialogLineData_2.DialogPerformanceData_2',
+        # Family Jewel BALEX mech activation
+        '/Game/Dialog/Scripts/Scripted/DialogScript_Watership.DialogScript_Watership:DialogTimeSlotData_229.DialogLineData_93.DialogPerformanceData_97',
+        # The First VH Lilith
+        '/Game/Dialog/Scripts/Scripted/DialogScript_Desolate.DialogScript_Desolate:DialogTimeSlotData_9.DialogLineData_0.DialogPerformanceData_0',
+        # Footsteps of Giants grave key
+        '/Game/Dialog/Scripts/Scripted/DialogScript_Beach.DialogScript_Beach:DialogTimeSlotData_72.DialogLineData_0.DialogPerformanceData_0',
     ],
     Game.WL:[
         # Tutorial Prophecy to quest complete
-        "DialogPerformanceData'/Game/Dialog/Scripts/MainMissions/DialogScript_Main_M00.DialogScript_Main_M00:DialogTimeSlotData_187.DialogLineData_0.DialogPerformanceData_0'",
+        "/Game/Dialog/Scripts/MainMissions/DialogScript_Main_M00.DialogScript_Main_M00:DialogTimeSlotData_187.DialogLineData_0.DialogPerformanceData_0",
         # Ballad of Bones First Mate
-        "DialogPerformanceData'/Game/Dialog/Scripts/MainMissions/DialogScript_Main_M06.DialogScript_Main_M06:DialogTimeSlotData_136.DialogLineData_0.DialogPerformanceData_0'",
+        "/Game/Dialog/Scripts/MainMissions/DialogScript_Main_M06.DialogScript_Main_M06:DialogTimeSlotData_136.DialogLineData_0.DialogPerformanceData_0",
         # Ballad of Bones Marley Maiden Tunnel
-        "DialogPerformanceData'/Game/Dialog/Scripts/MainMissions/DialogScript_Main_M06.DialogScript_Main_M06:DialogTimeSlotData_73.DialogLineData_0.DialogPerformanceData_0'",
-        "DialogPerformanceData'/Game/Dialog/Scripts/MainMissions/DialogScript_Main_M06.DialogScript_Main_M06:DialogTimeSlotData_187.DialogLineData_0.DialogPerformanceData_0'",
-        "DialogPerformanceData'/Game/Dialog/Scripts/MainMissions/DialogScript_Main_M06.DialogScript_Main_M06:DialogTimeSlotData_157.DialogLineData_0.DialogPerformanceData_0'",
-        "DialogPerformanceData'/Game/Dialog/Scripts/MainMissions/DialogScript_Main_M06.DialogScript_Main_M06:DialogTimeSlotData_225.DialogLineData_0.DialogPerformanceData_0'",
+        "/Game/Dialog/Scripts/MainMissions/DialogScript_Main_M06.DialogScript_Main_M06:DialogTimeSlotData_73.DialogLineData_0.DialogPerformanceData_0",
+        "/Game/Dialog/Scripts/MainMissions/DialogScript_Main_M06.DialogScript_Main_M06:DialogTimeSlotData_187.DialogLineData_0.DialogPerformanceData_0",
+        "/Game/Dialog/Scripts/MainMissions/DialogScript_Main_M06.DialogScript_Main_M06:DialogTimeSlotData_157.DialogLineData_0.DialogPerformanceData_0",
+        "/Game/Dialog/Scripts/MainMissions/DialogScript_Main_M06.DialogScript_Main_M06:DialogTimeSlotData_225.DialogLineData_0.DialogPerformanceData_0",
         # Ossu-gol First Barrier
-        "DialogPerformanceData'/Game/Dialog/Scripts/MainMissions/DialogScript_Main_M09.DialogScript_Main_M09:DialogTimeSlotData_101.DialogLineData_0.DialogPerformanceData_0'",
+        "/Game/Dialog/Scripts/MainMissions/DialogScript_Main_M09.DialogScript_Main_M09:DialogTimeSlotData_101.DialogLineData_0.DialogPerformanceData_0",
     ]
 }[Game.get_current()]
 """DialogPerformanceDatas that break sequences if they are skipped, so we exclude them."""
@@ -42,20 +66,20 @@ if Game.get_current() is Game.WL:
     }
 
 _storyStyles = [
-    find_object("DialogStyle","/Game/Dialog/Styles/DialogStyle_Scripted_High.DialogStyle_Scripted_High"),
-    #find_object("DialogStyle","/Game/Dialog/Styles/DialogStyle_Scripted_High_Simultaneous.DialogStyle_Scripted_High_Simultaneous"),
+    "/Game/Dialog/Styles/DialogStyle_Scripted_High.DialogStyle_Scripted_High",
+    "/Game/Dialog/Styles/DialogStyle_Scripted_High_Simultaneous.DialogStyle_Scripted_High_Simultaneous",
 ]
 if Game.get_current() is Game.BL3:
     _storyStyles += [
-        #find_object("DialogStyle","/Game/Dialog/Styles/DialogStyle_Scripted_High_Interrupt.DialogStyle_Scripted_High_Interrupt"),
-        #find_object("DialogStyle","/Game/Dialog/Styles/DialogStyle_Scripted_High_NoSubs.DialogStyle_Scripted_High_NoSubs"),
-        find_object("DialogStyle","/Game/Dialog/Styles/DialogStyle_Scripted_High_NoWait.DialogStyle_Scripted_High_NoWait"),
-        #find_object("DialogStyle","/Game/Dialog/Styles/DialogStyle_Scripted_High_Simultaneous_NoSubs.DialogStyle_Scripted_High_Simultaneous_NoSubs"),
-        find_object("DialogStyle","/Game/Dialog/Styles/DialogStyle_Scripted_Low.DialogStyle_Scripted_Low"),
-        find_object("DialogStyle","/Game/Dialog/Styles/DialogStyle_Scripted_Low_NoSubs.DialogStyle_Scripted_Low_NoSubs"),
-        #find_object("DialogStyle","/Game/Dialog/Styles/DialogStyle_Scripted_MultiLine_Playback.DialogStyle_Scripted_MultiLine_Playback"),
-        #find_object("DialogStyle","/Game/Dialog/Styles/DialogStyle_Scripted_MultiLine_Playback_NoSubs.DialogStyle_Scripted_MultiLine_Playback_NoSubs"),
-        #find_object("DialogStyle","/Game/Dialog/Styles/DialogStyle_Scripted_VOG.DialogStyle_Scripted_VOG")
+        "/Game/Dialog/Styles/DialogStyle_Scripted_High_Interrupt.DialogStyle_Scripted_High_Interrupt",
+        "/Game/Dialog/Styles/DialogStyle_Scripted_High_NoSubs.DialogStyle_Scripted_High_NoSubs",
+        "/Game/Dialog/Styles/DialogStyle_Scripted_High_NoWait.DialogStyle_Scripted_High_NoWait",
+        "/Game/Dialog/Styles/DialogStyle_Scripted_High_Simultaneous_NoSubs.DialogStyle_Scripted_High_Simultaneous_NoSubs",
+        "/Game/Dialog/Styles/DialogStyle_Scripted_Low.DialogStyle_Scripted_Low",
+        "/Game/Dialog/Styles/DialogStyle_Scripted_Low_NoSubs.DialogStyle_Scripted_Low_NoSubs",
+        "/Game/Dialog/Styles/DialogStyle_Scripted_MultiLine_Playback.DialogStyle_Scripted_MultiLine_Playback",
+        "/Game/Dialog/Styles/DialogStyle_Scripted_MultiLine_Playback_NoSubs.DialogStyle_Scripted_MultiLine_Playback_NoSubs",
+        "/Game/Dialog/Styles/DialogStyle_Scripted_VOG.DialogStyle_Scripted_VOG"
     ]
 
 _pathDict = {
@@ -82,7 +106,17 @@ _pathDict = {
     }
 }[Game.get_current()]
 
-_originalChances: Dict[int, float] = {}
+try:
+    reloading   # type: ignore
+except NameError:
+    reloading = False # means the module is being imported
+    _originalDialogChances: Dict[int, float] = {}
+    _originalSoundChances: Dict[str, float] = {}
+    _loadedStoryStyles: List[UObject] = []
+    #print("import")
+else:
+    reloading = True # means the module is being reloaded
+    #print("reload")
 
 
 anyEnabled: BoolOption = BoolOption("All Dialog", True, "On", "Off")
@@ -119,8 +153,13 @@ def GetClassOptionValueFromKey(key: str) -> bool:
 @hook("/Script/Engine.PlayerController:ServerNotifyLoadedWorld", Type.POST)
 def LoadedWorld(obj: UObject, args: WrappedStruct, ret: Any, func: BoundFunction) -> None:
     """ Called when a new level is loaded. """
-    global _originalChances
-    _originalChances = {}
+    global _originalDialogChances, _originalSoundChances, _loadedStoryStyles, _storyStyles
+    _loadedStoryStyles = []
+    for s in _storyStyles:
+        try:
+            _loadedStoryStyles.append(find_object("DialogStyle", s))
+        except:
+            pass
     UpdateDialogObjects()
     UpdateSoundObjects()
 
@@ -128,28 +167,47 @@ def LoadedWorld(obj: UObject, args: WrappedStruct, ret: Any, func: BoundFunction
 def ExecuteTeleport(obj: UObject, args: WrappedStruct, ret: Any, func: BoundFunction) -> None:
     UpdateSoundObjects()
 
+@hook("/Script/OakGame.OakDialogBlackboard:BindEchoLogInitialPlayFinished", Type.POST)
+def BindEchoLogInitialPlayFinished(obj, args, ret, func: BoundFunction):
+    if echoesEnabled.value and storyEnabled.value:
+        return
+    finishedEvent: BoundFunction = args.Event
+    if finishedEvent:
+        finishedEvent()
+
 
 def ApplyChanceToPlayScale(obj: UObject, percentage: int):
-    global _originalChances
-    if obj.InternalIndex not in _originalChances:
-        _originalChances[obj.InternalIndex] = obj.ChanceToPlay
+    """
+    Some objects remain loaded across levels so we can't just reset our dicts if we want to store the original chances.
+    We need a unique ID for an object to store and retrieve these chances (or keep a pointer and check if unloaded).
+    We can't use InternalIndex because these get allocated on load and reallocated if unloaded.
+    We use WwiseEventShortID for DialogPerformanceDatas because these seem to be fixed.
+    For others we just use the Name.
+    """
+    global _originalDialogChances, _originalSoundChances
+    objID: int | str = obj.Name
+    originals: Dict[Any, float] = _originalSoundChances
+    if hasattr(obj, "WwiseEventShortID"):
+        objID = obj.WwiseEventShortID
+        originals = _originalDialogChances
+
+    if objID not in originals:
+        originals[objID] = obj.ChanceToPlay
     
     if percentage == 100:
-        obj.ChanceToPlay = _originalChances[obj.InternalIndex]
+        obj.ChanceToPlay = originals[objID]
         return
     if percentage == 0:
         obj.ChanceToPlay = 0
         return
-    obj.ChanceToPlay = _originalChances[obj.InternalIndex] * (percentage / 100)
-    
+    obj.ChanceToPlay = originals[objID] * (percentage / 100)
+
                 
 def UpdateDialogObjects():
     """
     Find all the loaded DialogPerformanceDatas, and adjust the ChanceToPlays.
     """
     for perf in find_all("DialogPerformanceData"):
-        if str(perf) in WHITELIST:
-            continue
         
         ApplyChanceToPlayScale(perf, 100)
         
@@ -162,22 +220,22 @@ def UpdateDialogObjects():
                 ApplyChanceToPlayScale(perf, 0)
             continue
         
-        if perf.style is not None:
-            if not calloutsEnabled.value and perf.style.bCallout:
+        if perf.Style is not None:
+            if not calloutsEnabled.value and perf.Style.bCallout:
                 ApplyChanceToPlayScale(perf, 0)
                 continue
-            if not storyEnabled.value and perf.style in _storyStyles:
+            if not storyEnabled.value and perf.Style in _loadedStoryStyles:
                 ApplyChanceToPlayScale(perf, 0)
                 continue
             for k,v in _stylesDict.items():
-                if perf.style is v:
+                if perf.Style is v:
                     percentage = GetStyleOptionValueFromKey(k)
                     ApplyChanceToPlayScale(perf, percentage)
                     break
         
         for k,v in _pathDict.items():
             if not GetClassOptionValueFromKey(k):
-                if str(perf).startswith("DialogPerformanceData'" + v):
+                if perf._path_name().startswith(v):
                     ApplyChanceToPlayScale(perf, 0)
                     break
 
@@ -200,17 +258,6 @@ def UpdateSoundObjects():
                 ApplyChanceToPlayScale(tag, 100)
     
     for data in find_all("OakCharacterSoundData"):
-        data.bOverrideCorrosivePainLoop = dotEnabled.value
-        data.bOverrideCryoPainLoop = dotEnabled.value
-        data.bOverrideFirePainLoop = dotEnabled.value
-        data.bOverrideRadiationPainLoop = dotEnabled.value
-        data.bOverrideShockPainLoop = dotEnabled.value
-        if Game.get_current() is Game.BL3:
-            data.bOverrideSlagPainLoop = dotEnabled.value
-        if Game.get_current() is Game.WL:
-            data.bOverrideDarkMagicPainLoop = dotEnabled.value
-            data.bOverridePoisonPainLoop = dotEnabled.value
-        
         if not dotEnabled.value:
             data.CorrosivePainLoop = None
             data.CryoPainLoop = None
