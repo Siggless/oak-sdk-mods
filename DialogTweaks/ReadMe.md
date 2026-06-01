@@ -1,4 +1,8 @@
 # Changelog
+
+## v1.3
++ Whitelisted sequence-breaking dialog in BL3 DLCs.
+
 ## v1.2
 + Whitelisted sequence-breaking story dialog in BL3 base game.
 + Fixed Echo logs, lore scrolls, Typhon logs and Writings progressing objectives and challenges.

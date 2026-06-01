@@ -1,5 +1,5 @@
 [project]
-name = "Pickup As Trash"
+name = "PickupAsTrash"
 version = "1.1"
 authors = [{name = "Siggles"}]
 description = """

@@ -1,17 +1,16 @@
 from mods_base import build_mod, hook, Game, Mod, BoolOption, NestedOption, SliderOption
 from typing import Any, Dict, List
 from unrealsdk import find_all, find_object
-from unrealsdk.hooks import Type
+from unrealsdk.logging import misc
+from unrealsdk.hooks import Type, Block
 from unrealsdk.unreal import UObject, WrappedStruct, BoundFunction
 
 
 WHITELIST = {
     Game.BL3:[
+        ## Base Game
         # Sanctuary decompression crash
         "/Game/Dialog/Scripts/Scripted/DialogScript_Sanctuary.DialogScript_Sanctuary:DialogTimeSlotData_24.DialogLineData_24.DialogPerformanceData_24",
-        # Lorelei door objective advance
-        "/Game/Dialog/Scripts/Scripted/DialogScript_Hostile_Takeover.DialogScript_Hostile_Takeover:DialogTimeSlotData_73.DialogLineData_0.DialogPerformanceData_0",
-        #"/Game/Dialog/Scripts/Scripted/DialogScript_Hostile_Takeover.DialogScript_Hostile_Takeover:DialogTimeSlotData_126.DialogLineData_0.DialogPerformanceData_0",
         # Follow Maya bell 3
         "/Game/Dialog/Scripts/Scripted/DialogScript_Monastery.DialogScript_Monastery:DialogTimeSlotData_104.DialogLineData_0.DialogPerformanceData_0",
         # Sanctuary 3 Lilith Maya convo block
@@ -23,18 +22,28 @@ WHITELIST = {
         # Beneath the Meridian funeral end
         '/Game/Dialog/Scripts/Scripted/DialogScript_City_Vault.DialogScript_City_Vault:DialogTimeSlotData_174.DialogLineData_0.DialogPerformanceData_0',
         # Hammerlocked start
+        '/Game/Dialog/Scripts/Scripted/DialogScript_Prison.DialogScript_Prison:DialogTimeSlotData_27.DialogLineData_0.DialogPerformanceData_1',
         '/Game/Dialog/Scripts/Scripted/DialogScript_Prison.DialogScript_Prison:DialogTimeSlotData_27.DialogLineData_1.DialogPerformanceData_1',
-        #'/Game/Dialog/Scripts/Scripted/DialogScript_Prison.DialogScript_Prison:DialogTimeSlotData_28.DialogLineData_2.DialogPerformanceData_2',
+        '/Game/Dialog/Scripts/Scripted/DialogScript_Prison.DialogScript_Prison:DialogTimeSlotData_27.DialogLineData_2.DialogPerformanceData_1',
+        '/Game/Dialog/Scripts/Scripted/DialogScript_Prison.DialogScript_Prison:DialogTimeSlotData_27.DialogLineData_3.DialogPerformanceData_1',
         # Family Jewel BALEX mech activation
         '/Game/Dialog/Scripts/Scripted/DialogScript_Watership.DialogScript_Watership:DialogTimeSlotData_229.DialogLineData_93.DialogPerformanceData_97',
         # The First VH Lilith
         '/Game/Dialog/Scripts/Scripted/DialogScript_Desolate.DialogScript_Desolate:DialogTimeSlotData_9.DialogLineData_0.DialogPerformanceData_0',
         # Footsteps of Giants grave key
         '/Game/Dialog/Scripts/Scripted/DialogScript_Beach.DialogScript_Beach:DialogTimeSlotData_72.DialogLineData_0.DialogPerformanceData_0',
+        ## Xylourgos
+        # Cold Case Hand-ins
+        '/Game/PatchDLC/Hibiscus/Dialog/Scripts/Sidequests/DialogScript_DLC2_SQ_Private_Eye_Pt1.DialogScript_DLC2_SQ_Private_Eye_Pt1:DialogTimeSlotData_7.DialogLineData_0.DialogPerformanceData_0',
+        '/Game/PatchDLC/Hibiscus/Dialog/Scripts/Sidequests/DialogScript_DLC2_SQ_Private_Eye_Pt2.DialogScript_DLC2_SQ_Private_Eye_Pt2:DialogTimeSlotData_74.DialogLineData_0.DialogPerformanceData_0',
+        ## Gehenna
+        # Rose Toge
+        '/Game/PatchDLC/Geranium/Dialog/Scripts/Scripted/DialogScript_DLC3_Main_Missions.DialogScript_DLC3_Main_Missions:DialogTimeSlotData_44.DialogLineData_0.DialogPerformanceData_0',
+        # Doc Stanley Aggro
+        '/Game/PatchDLC/Geranium/Dialog/Scripts/Sidequests/DialogScript_DLC3_SQ_Miracle_Man.DialogScript_DLC3_SQ_Miracle_Man:DialogTimeSlotData_36.DialogLineData_0.DialogPerformanceData_0',
+        '/Game/PatchDLC/Geranium/Dialog/Scripts/Sidequests/DialogScript_DLC3_SQ_Miracle_Man.DialogScript_DLC3_SQ_Miracle_Man:DialogTimeSlotData_38.DialogLineData_0.DialogPerformanceData_0',
     ],
     Game.WL:[
-        # Tutorial Prophecy to quest complete
-        "/Game/Dialog/Scripts/MainMissions/DialogScript_Main_M00.DialogScript_Main_M00:DialogTimeSlotData_187.DialogLineData_0.DialogPerformanceData_0",
         # Ballad of Bones First Mate
         "/Game/Dialog/Scripts/MainMissions/DialogScript_Main_M06.DialogScript_Main_M06:DialogTimeSlotData_136.DialogLineData_0.DialogPerformanceData_0",
         # Ballad of Bones Marley Maiden Tunnel
@@ -91,7 +100,19 @@ _pathDict = {
         "Salvage Challenge" : "/Game/Dialog/Scripts/CrewChallenges/DialogScript_Crew_Challenges_Salvage",
         "Typhon Challenge" : "/Game/Dialog/Scripts/CrewChallenges/DialogScript_Crew_Challenges_Typhon",
         "Vehicle Challenge" : "/Game/Dialog/Scripts/CrewChallenges/DialogScript_Crew_Challenges_Vehicle",
-        "Writings Challenge" : "/Game/Dialog/Scripts/CrewChallenges/DialogScript_Crew_Challenges_Writings"
+        "Writings Challenge" : "/Game/Dialog/Scripts/CrewChallenges/DialogScript_Crew_Challenges_Writings",
+        "Jackpot - Ember Challenge" : "/Game/PatchDLC/Dandelion/Dialog/Scripts/Misc/DialogScript_DLC1_Crew_Challenges_Ember",
+        "Jackpot - Mayor Challenge" : "/Game/PatchDLC/Dandelion/Dialog/Scripts/Misc/DialogScript_DLC1_Crew_Challenges_Mayor",
+        "Jackpot - Torgue Challenge" : "/Game/PatchDLC/Dandelion/Dialog/Scripts/Misc/DialogScript_DLC1_Crew_Challenges_Torgue",
+        "GLT - Gaige Challenge" : "/Game/PatchDLC/Hibiscus/Dialog/Scripts/Misc/DialogScript_DLC2_Crew_Challenge_Gaige",
+        "GLT - Hunt Challenge" : "/Game/PatchDLC/Dandelion/Dialog/Scripts/Misc/DialogScript_DLC2_Crew_Challenge_Hammerlock",
+        "GLT - Statue Challenge" : "/Game/PatchDLC/Dandelion/Dialog/Scripts/Misc/DialogScript_DLC2_Crew_Challenge_Mancubus",
+        "Bounty - Movie Challenge" : "/Game/PatchDLC/Geranium/Dialog/Scripts/Misc/DialogScript_DLC3_Crew_Challenge_CreatureFeature",
+        "Bounty - Journal Challenge" : "/Game/PatchDLC/Geranium/Dialog/Scripts/Misc/DialogScript_DLC3_Crew_Challenge_Journals",
+        "Bounty - Juno Challenge" : "/Game/PatchDLC/Geranium/Dialog/Scripts/Misc/DialogScript_DLC3_Crew_Challenge_Juno",
+        "Bounty - Hunt Challenge" : "/Game/PatchDLC/Geranium/Dialog/Scripts/Misc/DialogScript_DLC3_Crew_Challenge_Tannery",
+        "Bounty - Treasure Challenge" : "/Game/PatchDLC/Geranium/Dialog/Scripts/Misc/DialogScript_DLC3_Crew_Challenge_TreasureMaps",
+        "Kreig Challenge" : "/Game/PatchDLC/Alisma/Dialog/Scripts/Misc/DialogScript_DLC4_Crew_Challenge_Tannis"
     },
     Game.WL : {
         "New-U" : "/Game/Dialog/Scripts/VOCT/DialogScript_VOCT_NEW-U",
@@ -106,17 +127,52 @@ _pathDict = {
     }
 }[Game.get_current()]
 
+
 try:
-    reloading   # type: ignore
+    reloading # type: ignore
 except NameError:
     reloading = False # means the module is being imported
     _originalDialogChances: Dict[int, float] = {}
     _originalSoundChances: Dict[str, float] = {}
     _loadedStoryStyles: List[UObject] = []
-    #print("import")
 else:
     reloading = True # means the module is being reloaded
     #print("reload")
+
+@hook("/Script/OakGame.OakDialogBlackboard:BindEchoLogInitialPlayFinished", Type.POST)
+def BindEchoLogInitialPlayFinished(obj, args, ret, func: BoundFunction):
+    if echoesEnabled.value and storyEnabled.value:
+        return
+    finishedEvent: BoundFunction = args.Event
+    if finishedEvent:
+        finishedEvent()
+
+@hook("/Script/GbxDialog.GbxDialogComponent:StartPerformance", Type.PRE)
+def StartPerformance(obj, args, ret, func) -> type[Block] | None:
+    perf = args.Performance
+    
+    if perf._path_name() in WHITELIST:
+        return
+    
+    skipThisShiz: bool = not anyEnabled.value
+    
+    if perf.EchoData and not echoesEnabled.value:
+        skipThisShiz = True
+    
+    if perf.Style is not None:
+        if not calloutsEnabled.value and perf.Style.bCallout:
+            skipThisShiz = True
+        if not storyEnabled.value and perf.Style in _loadedStoryStyles:
+            skipThisShiz = True
+    
+    if not skipThisShiz:
+        for k,v in _pathDict.items():
+            if not GetClassOptionValueFromKey(k):
+                if perf._path_name().startswith(v):
+                    skipThisShiz = True
+
+    if skipThisShiz:
+        return Block
 
 
 anyEnabled: BoolOption = BoolOption("All Dialog", True, "On", "Off")
@@ -125,7 +181,7 @@ calloutsEnabled: BoolOption = BoolOption("Combat Callouts", True, "On", "Off", d
 dotEnabled: BoolOption = BoolOption("DOT Screams", True, "On", "Off", description="Requires a map change to re-enable.")
 painEnabled: BoolOption = BoolOption("Pain/Stagger/Flinch", True, "On", "Off")
 deathEnabled: BoolOption = BoolOption("Creature Deaths", True, "On", "Off")
-echoesEnabled: BoolOption = BoolOption("ECHO Logs/Lore Scrolls", True, "On", "Off")
+echoesEnabled: BoolOption = BoolOption("ECHO Logs" if Game.get_current() is Game.BL3 else "Lore Scrolls", True, "On", "Off")
 styleOptions = NestedOption("Frequency Options", [
         SliderOption(key, 100, 0, 100, description="The percentage chance for this type of dialog to play, scaled by the default chance to play.")
         for key in _stylesDict.keys()
@@ -159,7 +215,7 @@ def LoadedWorld(obj: UObject, args: WrappedStruct, ret: Any, func: BoundFunction
         try:
             _loadedStoryStyles.append(find_object("DialogStyle", s))
         except:
-            pass
+            misc(f"Story style {s} is does not exist!")
     UpdateDialogObjects()
     UpdateSoundObjects()
 
@@ -167,16 +223,8 @@ def LoadedWorld(obj: UObject, args: WrappedStruct, ret: Any, func: BoundFunction
 def ExecuteTeleport(obj: UObject, args: WrappedStruct, ret: Any, func: BoundFunction) -> None:
     UpdateSoundObjects()
 
-@hook("/Script/OakGame.OakDialogBlackboard:BindEchoLogInitialPlayFinished", Type.POST)
-def BindEchoLogInitialPlayFinished(obj, args, ret, func: BoundFunction):
-    if echoesEnabled.value and storyEnabled.value:
-        return
-    finishedEvent: BoundFunction = args.Event
-    if finishedEvent:
-        finishedEvent()
 
-
-def ApplyChanceToPlayScale(obj: UObject, percentage: int):
+def ApplyChanceToPlayScale(obj: UObject, percentage: int, originals: Dict, objID: int | str):
     """
     Some objects remain loaded across levels so we can't just reset our dicts if we want to store the original chances.
     We need a unique ID for an object to store and retrieve these chances (or keep a pointer and check if unloaded).
@@ -184,13 +232,6 @@ def ApplyChanceToPlayScale(obj: UObject, percentage: int):
     We use WwiseEventShortID for DialogPerformanceDatas because these seem to be fixed.
     For others we just use the Name.
     """
-    global _originalDialogChances, _originalSoundChances
-    objID: int | str = obj.Name
-    originals: Dict[Any, float] = _originalSoundChances
-    if hasattr(obj, "WwiseEventShortID"):
-        objID = obj.WwiseEventShortID
-        originals = _originalDialogChances
-
     if objID not in originals:
         originals[objID] = obj.ChanceToPlay
     
@@ -208,35 +249,18 @@ def UpdateDialogObjects():
     Find all the loaded DialogPerformanceDatas, and adjust the ChanceToPlays.
     """
     for perf in find_all("DialogPerformanceData"):
-        
-        ApplyChanceToPlayScale(perf, 100)
-        
-        if not anyEnabled.value:
-            ApplyChanceToPlayScale(perf, 0)
-            continue
-
-        if perf.EchoData:
-            if not echoesEnabled.value:
-                ApplyChanceToPlayScale(perf, 0)
+        if perf.EchoData:   # World logs don't go through StartPerformance, so to set the ChanceToPlay too.
+            if echoesEnabled.value:
+                ApplyChanceToPlayScale(perf, 100, _originalDialogChances, perf.WwiseEventShortID)
+            else:
+                ApplyChanceToPlayScale(perf, 0, _originalDialogChances, perf.WwiseEventShortID)
             continue
         
         if perf.Style is not None:
-            if not calloutsEnabled.value and perf.Style.bCallout:
-                ApplyChanceToPlayScale(perf, 0)
-                continue
-            if not storyEnabled.value and perf.Style in _loadedStoryStyles:
-                ApplyChanceToPlayScale(perf, 0)
-                continue
             for k,v in _stylesDict.items():
                 if perf.Style is v:
                     percentage = GetStyleOptionValueFromKey(k)
-                    ApplyChanceToPlayScale(perf, percentage)
-                    break
-        
-        for k,v in _pathDict.items():
-            if not GetClassOptionValueFromKey(k):
-                if perf._path_name().startswith(v):
-                    ApplyChanceToPlayScale(perf, 0)
+                    ApplyChanceToPlayScale(perf, percentage, _originalDialogChances, perf.WwiseEventShortID)
                     break
 
 
@@ -248,14 +272,14 @@ def UpdateSoundObjects():
     for tag in find_all("CharacterSoundTag"):
         if tag.bPainVox:
             if not painEnabled.value:
-                ApplyChanceToPlayScale(tag, 0)
+                ApplyChanceToPlayScale(tag, 0, _originalSoundChances, tag.Name)
             else:
-                ApplyChanceToPlayScale(tag, 100)
+                ApplyChanceToPlayScale(tag, 100, _originalSoundChances, tag.Name)
         elif tag.bDeathVox:
             if not deathEnabled.value:
-                ApplyChanceToPlayScale(tag, 0)
+                ApplyChanceToPlayScale(tag, 0, _originalSoundChances, tag.Name)
             else:
-                ApplyChanceToPlayScale(tag, 100)
+                ApplyChanceToPlayScale(tag, 100, _originalSoundChances, tag.Name)
     
     for data in find_all("OakCharacterSoundData"):
         if not dotEnabled.value:
